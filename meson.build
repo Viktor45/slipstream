@@ -99,24 +99,24 @@ picoquic_proj = cmake.subproject(
 
 # ---- System deps ----
 threads_dep = dependency('threads')
-openssl_dep = dependency('openssl', required: true)
+openssl_dep = dependency('openssl')
 
 # ---- Picoquic / Picotls deps from CMake subproject ----
 
 # основная библиотека picoquic
 picoquic_core_dep = picoquic_proj.dependency('picoquic-core')
 
-# ядро picotls (дает ptls_buffer_reserve, ptls_mem_equal и т.п.)
-ptls_core_dep = picoquic_proj.dependency('picotls-core', required: true)
+# ядро picotls (даёт ptls_buffer_reserve, ptls_mem_equal и т.п.)
+ptls_core_dep = picoquic_proj.dependency('picotls-core')
 
 # backend openssl (ptls_openssl_*)
-ptls_openssl_dep = picoquic_proj.dependency('picotls-openssl', required: true)
+ptls_openssl_dep = picoquic_proj.dependency('picotls-openssl')
 
 # backend minicrypto (ptls_minicrypto_*)
-ptls_minicrypto_dep = picoquic_proj.dependency('picotls-minicrypto', required: false)
+ptls_minicrypto_dep = picoquic_proj.dependency('picotls-minicrypto')
 
 # fusion (ptls_fusion_aes128gcm / aes256gcm)
-ptls_fusion_dep = picoquic_proj.dependency('picotls-fusion', required: false)
+ptls_fusion_dep = picoquic_proj.dependency('picotls-fusion')
 
 # Dependencies used by both executables
 slipstream_cli_deps = [
@@ -125,15 +125,9 @@ slipstream_cli_deps = [
   picoquic_core_dep,
   ptls_core_dep,
   ptls_openssl_dep,
+  ptls_minicrypto_dep,
+  ptls_fusion_dep,
 ]
-
-if ptls_minicrypto_dep.found()
-  slipstream_cli_deps += ptls_minicrypto_dep
-endif
-
-if ptls_fusion_dep.found()
-  slipstream_cli_deps += ptls_fusion_dep
-endif
 
 # Link optional picoquic logging
 if loglib_enabled
