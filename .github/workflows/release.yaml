@@ -23,25 +23,20 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt install -y pkg-config libssl-dev ninja-build
+          sudo apt-get install -y pkg-config libssl-dev ninja-build meson clang
 
-      - name: Configure CMake
+      - name: Configure Meson
+        env:
+          CC: clang
+          CXX: clang++
         run: |
-          cmake \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DCMAKE_MAKE_PROGRAM=ninja \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -G Ninja \
-            -S ${{github.workspace}} \
-            -B ${{github.workspace}}/build
+          # BUILD_TYPE is "Release"; Meson expects "release"
+          meson setup build \
+            --buildtype=${BUILD_TYPE,,}
 
-      - name: Build with CMake
+      - name: Build with Meson
         run: |
-          cmake \
-            --build ${{github.workspace}}/build \
-            -j $(nproc) \
-            --target slipstream-client slipstream-server
+          meson compile -C build slipstream-client slipstream-server
 
       - name: Rename Binaries
         run: |
