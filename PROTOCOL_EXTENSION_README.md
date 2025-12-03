@@ -1,48 +1,48 @@
 # Slipstream Protocol Extension System
 
-## نظرة عامة
+## Overview
 
-تم تطوير نظام مرن لإضافة دعم البروتوكولات الإضافية إلى slipstream. هذا النظام يسمح بإضافة بروتوكولات جديدة بسهولة دون تعديل الكود الأساسي.
+A flexible system has been developed to add support for additional protocols to slipstream. This system allows new protocols to be added easily without modifying the core code.
 
-## البروتوكولات المدعومة
+## Supported Protocols
 
-### 1. TCP (الافتراضي)
-- **الاستخدام**: نفق TCP تقليدي
-- **الميزات**: اتصال موثوق، دعم multiplexing
-- **المنفذ الافتراضي**: 80
+### 1. TCP (Default)
+- **Usage**: Traditional TCP tunnel
+- **Features**: Reliable connection, multiplexing support
+- **Default Port**: 80
 
 ### 2. UDP
-- **الاستخدام**: نفق UDP بدون اتصال
-- **الميزات**: سريع، مناسب للبيانات في الوقت الفعلي
-- **المنفذ الافتراضي**: 53
+- **Usage**: Connectionless UDP tunnel
+- **Features**: Fast, suitable for real-time data
+- **Default Port**: 53
 
 ### 3. HTTP
-- **الاستخدام**: نفق HTTP مع معالجة الطلبات والاستجابات
-- **الميزات**: دعم HTTP headers، معالجة الطلبات
-- **المنفذ الافتراضي**: 80
+- **Usage**: HTTP tunnel with request/response handling
+- **Features**: HTTP headers support, request processing
+- **Default Port**: 80
 
 ### 4. WebSocket
-- **الاستخدام**: نفق WebSocket مع handshake كامل
-- **الميزات**: دعم WebSocket frames، handshake تلقائي
-- **المنفذ الافتراضي**: 80
+- **Usage**: WebSocket tunnel with full handshake
+- **Features**: WebSocket frames support, automatic handshake
+- **Default Port**: 80
 
-## البنية المعمارية
+## Architecture
 
-### الملفات الرئيسية
+### Main Files
 
 ```
 include/
-├── slipstream_protocols.h          # واجهة النظام الأساسية
+├── slipstream_protocols.h          # Core system interface
 src/
-├── slipstream_protocols.c          # تنفيذ النظام الأساسي
-├── slipstream_udp_tunnel.c         # تنفيذ UDP tunneling
-├── slipstream_http_tunnel.c        # تنفيذ HTTP tunneling
-└── slipstream_websocket_tunnel.c   # تنفيذ WebSocket tunneling
+├── slipstream_protocols.c          # Core system implementation
+├── slipstream_udp_tunnel.c         # UDP tunneling implementation
+├── slipstream_http_tunnel.c        # HTTP tunneling implementation
+└── slipstream_websocket_tunnel.c   # WebSocket tunneling implementation
 examples/
-└── protocol_example.c              # مثال على الاستخدام
+└── protocol_example.c              # Usage example
 ```
 
-### الهياكل الأساسية
+### Core Structures
 
 #### `slipstream_protocol_type_t`
 ```c
@@ -70,128 +70,128 @@ typedef struct {
 } slipstream_protocol_handler_t;
 ```
 
-## كيفية الاستخدام
+## Usage
 
-### 1. استخدام أساسي
+### 1. Basic Usage
 
 ```c
 #include "slipstream_protocols.h"
 
-// تهيئة مدير البروتوكول
+// Initialize protocol manager
 slipstream_protocol_manager_t manager;
 slipstream_protocol_manager_init(&manager, SLIPSTREAM_PROTOCOL_UDP);
 
-// إنشاء socket
+// Create socket
 struct sockaddr_storage target_addr;
-// ... إعداد العنوان ...
+// ... set up address ...
 int socket_fd = manager.handler->create_socket(manager.protocol_config, &target_addr);
 
-// إرسال البيانات
+// Send data
 const char* data = "Hello World";
 manager.handler->send_data(manager.protocol_config, socket_fd, 
                           (const uint8_t*)data, strlen(data));
 
-// تنظيف
+// Cleanup
 close(socket_fd);
 slipstream_protocol_manager_cleanup(&manager);
 ```
 
-### 2. استخدام UDP Tunnel
+### 2. UDP Tunnel Usage
 
 ```c
 #include "slipstream_udp_tunnel.c"
 
-// إنشاء سياق UDP tunnel
+// Create UDP tunnel context
 slipstream_udp_context_t* udp_ctx;
 struct sockaddr_storage target_addr;
-// ... إعداد العنوان ...
+// ... set up address ...
 
 slipstream_udp_tunnel_create(&udp_ctx, &target_addr, stream_id);
 
-// بدء النفق
+// Start tunnel
 int client_socket = accept(listen_socket, NULL, NULL);
 slipstream_udp_tunnel_start(udp_ctx, client_socket);
 
-// تنظيف
+// Cleanup
 slipstream_udp_tunnel_destroy(udp_ctx);
 ```
 
-### 3. استخدام HTTP Tunnel
+### 3. HTTP Tunnel Usage
 
 ```c
 #include "slipstream_http_tunnel.c"
 
-// إنشاء سياق HTTP tunnel
+// Create HTTP tunnel context
 slipstream_http_context_t* http_ctx;
 struct sockaddr_storage target_addr;
-// ... إعداد العنوان ...
+// ... set up address ...
 
 slipstream_http_tunnel_create(&http_ctx, &target_addr, stream_id, false); // false = HTTP, true = HTTPS
 
-// بدء النفق
+// Start tunnel
 int client_socket = accept(listen_socket, NULL, NULL);
 slipstream_http_tunnel_start(http_ctx, client_socket);
 
-// تنظيف
+// Cleanup
 slipstream_http_tunnel_destroy(http_ctx);
 ```
 
-### 4. استخدام WebSocket Tunnel
+### 4. WebSocket Tunnel Usage
 
 ```c
 #include "slipstream_websocket_tunnel.c"
 
-// إنشاء سياق WebSocket tunnel
+// Create WebSocket tunnel context
 slipstream_websocket_context_t* ws_ctx;
 struct sockaddr_storage target_addr;
-// ... إعداد العنوان ...
+// ... set up address ...
 
 slipstream_websocket_tunnel_create(&ws_ctx, &target_addr, stream_id, "example.com", 80);
 
-// بدء النفق
+// Start tunnel
 int client_socket = accept(listen_socket, NULL, NULL);
 slipstream_websocket_tunnel_start(ws_ctx, client_socket);
 
-// تنظيف
+// Cleanup
 slipstream_websocket_tunnel_destroy(ws_ctx);
 ```
 
-## إضافة بروتوكول جديد
+## Adding a New Protocol
 
-### 1. تعريف البروتوكول
+### 1. Define the Protocol
 
 ```c
-// في slipstream_protocols.h
+// In slipstream_protocols.h
 typedef enum {
-    // ... البروتوكولات الموجودة ...
+    // ... existing protocols ...
     SLIPSTREAM_PROTOCOL_MY_NEW_PROTOCOL = 6
 } slipstream_protocol_type_t;
 ```
 
-### 2. إنشاء ملف التنفيذ
+### 2. Create Implementation File
 
 ```c
-// في src/slipstream_my_protocol.c
+// In src/slipstream_my_protocol.c
 #include "slipstream_protocols.h"
 
-// تعريف handler functions
+// Define handler functions
 static int my_protocol_init(void* config) {
-    // تهيئة البروتوكول
+    // Protocol initialization
     return 0;
 }
 
 static void my_protocol_cleanup(void* config) {
-    // تنظيف البروتوكول
+    // Protocol cleanup
 }
 
 static int my_protocol_create_socket(void* config, struct sockaddr_storage* target_addr) {
-    // إنشاء socket للبروتوكول
+    // Create socket for protocol
     return socket(target_addr->ss_family, SOCK_STREAM, IPPROTO_TCP);
 }
 
-// ... باقي الـ handler functions ...
+// ... remaining handler functions ...
 
-// تعريف الـ handler
+// Define handler
 static slipstream_protocol_handler_t my_protocol_handler = {
     .init = my_protocol_init,
     .cleanup = my_protocol_cleanup,
@@ -203,13 +203,13 @@ static slipstream_protocol_handler_t my_protocol_handler = {
 };
 ```
 
-### 3. تحديث النظام الأساسي
+### 3. Update Core System
 
 ```c
-// في slipstream_protocols.c
-// إضافة البروتوكول الجديد إلى protocol_configs
+// In slipstream_protocols.c
+// Add new protocol to protocol_configs
 static const slipstream_protocol_config_t protocol_configs[] = {
-    // ... البروتوكولات الموجودة ...
+    // ... existing protocols ...
     {
         .type = SLIPSTREAM_PROTOCOL_MY_NEW_PROTOCOL,
         .name = "MY_PROTOCOL",
@@ -220,29 +220,29 @@ static const slipstream_protocol_config_t protocol_configs[] = {
     }
 };
 
-// إضافة handler في slipstream_protocol_manager_init
+// Add handler in slipstream_protocol_manager_init
 switch (protocol) {
-    // ... الحالات الموجودة ...
+    // ... existing cases ...
     case SLIPSTREAM_PROTOCOL_MY_NEW_PROTOCOL:
         manager->handler = &my_protocol_handler;
         break;
 }
 ```
 
-### 4. تحديث CMakeLists.txt
+### 4. Update CMakeLists.txt
 
 ```cmake
-# إضافة الملف الجديد إلى COMMON_SOURCES
+# Add new file to COMMON_SOURCES
 set(COMMON_SOURCES
-    # ... الملفات الموجودة ...
+    # ... existing files ...
     src/slipstream_my_protocol.c
-    # ... باقي الملفات ...
+    # ... remaining files ...
 )
 ```
 
-## التجميع والاختبار
+## Building and Testing
 
-### 1. تجميع المشروع
+### 1. Build Project
 
 ```bash
 mkdir build
@@ -251,60 +251,60 @@ cmake ..
 make
 ```
 
-### 2. تشغيل المثال
+### 2. Run Example
 
 ```bash
-# اختبار TCP
+# Test TCP
 ./examples/protocol_example tcp 127.0.0.1 80
 
-# اختبار UDP
+# Test UDP
 ./examples/protocol_example udp 127.0.0.1 53
 
-# اختبار HTTP
+# Test HTTP
 ./examples/protocol_example http 127.0.0.1 80
 
-# اختبار WebSocket
+# Test WebSocket
 ./examples/protocol_example websocket 127.0.0.1 80
 ```
 
-## المتطلبات
+## Requirements
 
-- **OpenSSL**: مطلوب لـ WebSocket tunneling
-- **pthread**: مطلوب للـ threading
-- **CMake 3.13+**: مطلوب للتجميع
+- **OpenSSL**: Required for WebSocket tunneling
+- **pthread**: Required for threading
+- **CMake 3.13+**: Required for building
 
-## الميزات المتقدمة
+## Advanced Features
 
-### 1. دعم Multiplexing
-البروتوكولات التي تدعم multiplexing يمكنها التعامل مع عدة اتصالات في نفس الوقت.
+### 1. Multiplexing Support
+Protocols supporting multiplexing can handle multiple connections simultaneously.
 
-### 2. إدارة الذاكرة
-النظام يدير الذاكرة تلقائياً ويتضمن cleanup functions.
+### 2. Memory Management
+The system automatically manages memory and includes cleanup functions.
 
 ### 3. Thread Safety
-جميع العمليات thread-safe باستخدام mutexes.
+All operations are thread-safe using mutexes.
 
 ### 4. Error Handling
-نظام شامل لمعالجة الأخطاء مع رسائل واضحة.
+Comprehensive error handling system with clear messages.
 
-## التطويرات المستقبلية
+## Future Developments
 
-1. **دعم ICMP**: إضافة دعم ICMP tunneling
-2. **دعم SCTP**: إضافة دعم SCTP protocol
-3. **دعم TLS**: إضافة دعم TLS tunneling
-4. **واجهة ويب**: إضافة واجهة ويب لإدارة البروتوكولات
-5. **مراقبة الأداء**: إضافة إحصائيات مفصلة للأداء
+1. **ICMP Support**: Add ICMP tunneling support
+2. **SCTP Support**: Add SCTP protocol support
+3. **TLS Support**: Add TLS tunneling support
+4. **Web Interface**: Add web interface for protocol management
+5. **Performance Monitoring**: Add detailed performance statistics
 
-## المساهمة
+## Contributing
 
-للمساهمة في تطوير النظام:
+To contribute to system development:
 
-1. Fork المشروع
-2. إنشاء branch جديد
-3. إضافة البروتوكول الجديد
-4. كتابة الاختبارات
-5. إرسال Pull Request
+1. Fork the project
+2. Create a new branch
+3. Add the new protocol
+4. Write tests
+5. Submit a Pull Request
 
-## الترخيص
+## License
 
-هذا المشروع مرخص تحت نفس ترخيص slipstream الأصلي.
+This project is licensed under the same license as the original slipstream.

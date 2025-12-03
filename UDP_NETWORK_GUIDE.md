@@ -1,12 +1,12 @@
-# دليل استخدام Slipstream في شبكة UDP مع جميع المنافذ مفتوحة
+# Slipstream UDP Network Usage Guide with All Ports Open
 
-## نظرة عامة
+## Overview
 
-هذا الدليل يوضح كيفية استخدام slipstream في شبكة UDP مع فتح جميع المنافذ من 1 إلى 65535. هذا يتيح لك استخدام تقنيات متقدمة لتجاوز الجدران النارية والوصول إلى الخدمات المحظورة.
+This guide explains how to use slipstream in a UDP network with all ports (1–65535) open. This enables you to apply advanced techniques for bypassing firewalls and accessing blocked services.
 
-## المتطلبات
+## Requirements
 
-### 1. المتطلبات الأساسية
+### 1. Basic Requirements
 ```bash
 # Ubuntu/Debian
 sudo apt-get update
@@ -20,332 +20,332 @@ sudo yum install cmake openssl-devel
 brew install cmake openssl
 ```
 
-### 2. المتطلبات الاختيارية
+### 2. Optional Requirements
 ```bash
-# أدوات الشبكة
+# Network tools
 sudo apt-get install netcat-openbsd nmap tcpdump
 
-# أدوات المراقبة
+# Monitoring tools
 sudo apt-get install htop iotop nethogs
 ```
 
-## التثبيت والإعداد
+## Installation and Setup
 
-### 1. تحميل وتجميع slipstream
+### 1. Downloading and Building slipstream
 ```bash
-# تحميل المشروع
-git clone https://github.com/EndPositive/slipstream.git
+# Clone the repository
+git clone https://github.com/EndPositive/slipstream.git  
 cd slipstream
 
-# تجميع المشروع
+# Build the project
 mkdir build
 cd build
 cmake ..
 make -j$(nproc)
 
-# العودة إلى المجلد الرئيسي
+# Return to the main directory
 cd ..
 ```
 
-### 2. إعداد الصلاحيات
+### 2. Setting Permissions
 ```bash
-# إعطاء صلاحيات التنفيذ للسكريبت
+# Make the setup script executable
 chmod +x scripts/udp_network_setup.sh
 
-# إعطاء صلاحيات root للـ ICMP (اختياري)
+# Grant root privileges for ICMP (optional)
 sudo chown root:root examples/udp_network_example
 sudo chmod +s examples/udp_network_example
 ```
 
-## الاستخدام الأساسي
+## Basic Usage
 
-### 1. استخدام بسيط
+### 1. Simple Usage
 ```bash
-# استخدام DNS tunnel مع Google DNS
+# Use DNS tunnel with Google DNS
 ./scripts/udp_network_setup.sh -h 8.8.8.8 -p 53
 
-# استخدام HTTP tunnel
+# Use HTTP tunnel
 ./scripts/udp_network_setup.sh -h httpbin.org -p 80 --bypass http
 
-# استخدام HTTPS tunnel
+# Use HTTPS tunnel
 ./scripts/udp_network_setup.sh -h example.com -p 443 --bypass https
 ```
 
-### 2. استخدام مع فحص المنافذ
+### 2. Usage with Port Scanning
 ```bash
-# فحص المنافذ من 1 إلى 65535
+# Scan all ports from 1 to 65535
 ./scripts/udp_network_setup.sh -h 8.8.8.8 -p 53 --scan-ports
 
-# فحص نطاق محدد من المنافذ
+# Scan a specific port range
 ./scripts/udp_network_setup.sh -h target.com -p 80 -s 1000 -e 2000 --scan-ports
 ```
 
-### 3. استخدام مع البروكسي
+### 3. Usage with Proxy
 ```bash
-# استخدام SOCKS5 proxy
+# Use SOCKS5 proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type socks5 --proxy-host proxy.example.com --proxy-port 1080
 
-# استخدام HTTP proxy
+# Use HTTP proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type http --proxy-host proxy.example.com --proxy-port 8080
 
-# استخدام Tor proxy
+# Use Tor proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type tor --proxy-host 127.0.0.1 --proxy-port 9050
 ```
 
-## تقنيات تجاوز الجدران النارية
+## Firewall Bypass Techniques
 
 ### 1. DNS Tunnel
 ```bash
-# استخدام DNS tunnel أساسي
+# Basic DNS tunnel usage
 ./examples/bypass_example dns 8.8.8.8 53
 
-# استخدام DNS tunnel مع fragmentation
+# DNS tunnel with fragmentation
 ./examples/udp_network_example 8.8.8.8 53 1 65535
 ```
 
 ### 2. HTTP Tunnel
 ```bash
-# استخدام HTTP tunnel
+# Use HTTP tunnel
 ./examples/bypass_example http httpbin.org 80
 
-# استخدام HTTP tunnel مع domain fronting
+# Use HTTP tunnel with domain fronting
 ./examples/bypass_example domain_fronting example.com 80
 ```
 
 ### 3. HTTPS Tunnel
 ```bash
-# استخدام HTTPS tunnel
+# Use HTTPS tunnel
 ./examples/bypass_example https example.com 443
 
-# استخدام HTTPS tunnel مع CDN bypass
+# Use HTTPS tunnel with CDN bypass
 ./examples/bypass_example cdn_bypass example.com 443
 ```
 
-### 4. تقنيات متقدمة
+### 4. Advanced Techniques
 ```bash
-# استخدام fragmentation bypass
+# Use fragmentation bypass
 ./examples/bypass_example fragmentation target.com 80
 
-# استخدام steganography bypass
+# Use steganography bypass
 ./examples/bypass_example steganography target.com 53
 
-# استخدام protocol mimicry
+# Use protocol mimicry
 ./examples/bypass_example mimicry target.com 80
 
-# استخدام port hopping
+# Use port hopping
 ./examples/bypass_example port_hopping target.com 80
 ```
 
-## الاستخدام المتقدم
+## Advanced Usage
 
-### 1. استخدام متعدد التقنيات
+### 1. Multi-Technique Usage
 ```bash
-# تشغيل عدة تقنيات بالتتابع
+# Run multiple bypass techniques consecutively
 ./scripts/udp_network_setup.sh -h target.com -p 80 --bypass dns --continuous
 ./scripts/udp_network_setup.sh -h target.com -p 80 --bypass http --continuous
 ./scripts/udp_network_setup.sh -h target.com -p 80 --bypass https --continuous
 ```
 
-### 2. استخدام مع البروكسي المتعدد
+### 2. Multi-Proxy Usage
 ```bash
-# استخدام SOCKS5 مع HTTP proxy
+# Use SOCKS5 with HTTP proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type socks5 --proxy-host proxy1.com --proxy-port 1080
 
-# استخدام Tor مع SSH proxy
+# Use Tor with SSH proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type tor --proxy-host 127.0.0.1 --proxy-port 9050
 ```
 
-### 3. استخدام مع التكوين المخصص
+### 3. Custom Configuration Usage
 ```bash
-# استخدام ملف التكوين
+# Use configuration file
 ./examples/udp_network_example --config config/udp_network_config.conf
 
-# استخدام preset مخصص
+# Use custom preset
 ./examples/udp_network_example --preset stealth
 ```
 
-## أمثلة عملية
+## Practical Examples
 
-### 1. تجاوز جدار ناري بسيط
+### 1. Simple Firewall Bypass
 ```bash
-# استخدام DNS tunnel لتجاوز جدار ناري
+# Use DNS tunnel to bypass firewall
 ./scripts/udp_network_setup.sh -h 8.8.8.8 -p 53 --bypass dns
 
-# استخدام HTTP tunnel لتجاوز جدار ناري
+# Use HTTP tunnel to bypass firewall
 ./scripts/udp_network_setup.sh -h httpbin.org -p 80 --bypass http
 ```
 
-### 2. تجاوز جدار ناري متقدم
+### 2. Advanced Firewall Bypass
 ```bash
-# استخدام HTTPS tunnel مع domain fronting
+# Use HTTPS tunnel with domain fronting
 ./scripts/udp_network_setup.sh -h example.com -p 443 \
   --bypass domain_fronting
 
-# استخدام CDN bypass
+# Use CDN bypass
 ./scripts/udp_network_setup.sh -h target.com -p 443 \
   --bypass cdn_bypass
 ```
 
-### 3. استخدام مع البروكسي
+### 3. Proxy Usage
 ```bash
-# استخدام SOCKS5 proxy
+# Use SOCKS5 proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type socks5 --proxy-host proxy.com --proxy-port 1080
 
-# استخدام Tor proxy
+# Use Tor proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type tor --proxy-host 127.0.0.1 --proxy-port 9050
 ```
 
-## المراقبة والتحليل
+## Monitoring and Analysis
 
-### 1. مراقبة الشبكة
+### 1. Network Monitoring
 ```bash
-# مراقبة حركة UDP
+# Monitor UDP traffic
 sudo tcpdump -i any udp
 
-# مراقبة حركة DNS
+# Monitor DNS traffic
 sudo tcpdump -i any port 53
 
-# مراقبة حركة HTTP
+# Monitor HTTP traffic
 sudo tcpdump -i any port 80
 ```
 
-### 2. تحليل الأداء
+### 2. Performance Analysis
 ```bash
-# مراقبة استخدام CPU
+# Monitor CPU usage
 htop
 
-# مراقبة استخدام الذاكرة
+# Monitor memory usage
 free -h
 
-# مراقبة استخدام الشبكة
+# Monitor network usage
 nethogs
 ```
 
-### 3. تحليل السجلات
+### 3. Log Analysis
 ```bash
-# عرض سجلات slipstream
+# View slipstream logs
 tail -f slipstream_udp.log
 
-# تحليل الإحصائيات
+# Analyze statistics
 cat slipstream_stats.json
 ```
 
-## استكشاف الأخطاء
+## Troubleshooting
 
-### 1. مشاكل الشبكة
+### 1. Network Issues
 ```bash
-# فحص الاتصال
+# Check connectivity
 ping target.com
 
-# فحص المنافذ
+# Check ports
 nc -u -v target.com 53
 
-# فحص DNS
+# Check DNS
 nslookup target.com
 ```
 
-### 2. مشاكل الصلاحيات
+### 2. Permission Issues
 ```bash
-# فحص صلاحيات root
+# Check root privileges
 sudo -l
 
-# فحص صلاحيات الملفات
+# Check file permissions
 ls -la examples/udp_network_example
 ```
 
-### 3. مشاكل التجميع
+### 3. Build Issues
 ```bash
-# فحص المكتبات
+# Check linked libraries
 ldd examples/udp_network_example
 
-# فحص OpenSSL
+# Check OpenSSL version
 openssl version
 ```
 
-## الأمان والخصوصية
+## Security and Privacy
 
-### 1. تشفير البيانات
+### 1. Data Encryption
 ```bash
-# استخدام HTTPS tunnel
+# Use HTTPS tunnel
 ./scripts/udp_network_setup.sh -h target.com -p 443 --bypass https
 
-# استخدام SSH proxy
+# Use SSH proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type ssh --proxy-host ssh.com --proxy-port 22
 ```
 
-### 2. إخفاء الهوية
+### 2. Identity Concealment
 ```bash
-# استخدام Tor proxy
+# Use Tor proxy
 ./scripts/udp_network_setup.sh -h target.com -p 80 \
   --proxy-type tor --proxy-host 127.0.0.1 --proxy-port 9050
 
-# استخدام domain fronting
+# Use domain fronting
 ./scripts/udp_network_setup.sh -h target.com -p 443 \
   --bypass domain_fronting
 ```
 
-### 3. حماية من الكشف
+### 3. Anti-Detection Measures
 ```bash
-# استخدام DPI evasion
+# Use DPI evasion
 ./examples/bypass_example dns target.com 53
 
-# استخدام traffic obfuscation
+# Use traffic obfuscation
 ./examples/bypass_example steganography target.com 53
 ```
 
-## التطويرات المستقبلية
+## Future Developments
 
-### 1. دعم IPv6
+### 1. IPv6 Support
 ```bash
-# استخدام IPv6
+# Use IPv6
 ./scripts/udp_network_setup.sh -h 2001:4860:4860::8888 -p 53
 ```
 
-### 2. دعم QUIC
+### 2. QUIC Support
 ```bash
-# استخدام QUIC protocol
+# Use QUIC protocol
 ./scripts/udp_network_setup.sh -h target.com -p 443 --bypass quic
 ```
 
-### 3. دعم WebRTC
+### 3. WebRTC Support
 ```bash
-# استخدام WebRTC tunneling
+# Use WebRTC tunneling
 ./scripts/udp_network_setup.sh -h target.com -p 443 --bypass webrtc
 ```
 
-## المساهمة
+## Contributing
 
-للمساهمة في تطوير النظام:
+To contribute to system development:
 
-1. Fork المشروع
-2. إنشاء branch جديد
-3. إضافة ميزة جديدة
-4. كتابة الاختبارات
-5. إرسال Pull Request
+1. Fork the project  
+2. Create a new branch  
+3. Add a new feature  
+4. Write tests  
+5. Submit a Pull Request  
 
-## الترخيص
+## License
 
-هذا المشروع مرخص تحت نفس ترخيص slipstream الأصلي.
+This project is licensed under the same license as the original slipstream.
 
-## تحذيرات قانونية
+## Legal Warnings
 
-⚠️ **تحذير**: استخدام تقنيات تجاوز الجدران النارية قد يكون غير قانوني في بعض البلدان. يرجى التأكد من الامتثال للقوانين المحلية قبل الاستخدام.
+⚠️ **Warning**: Using firewall bypass techniques may be used only for legal purposes in some countries. Please ensure compliance with local laws before use.
 
-## الدعم
+## Support
 
-للحصول على الدعم:
-- إنشاء issue في GitHub
-- مراجعة الوثائق
-- المشاركة في المناقشات
+For support:  
+- Create a GitHub issue  
+- Review the documentation  
+- Join discussions  
 
 ---
 
-**ملاحظة**: هذا النظام مصمم للأغراض التعليمية والبحثية. يرجى استخدامه بمسؤولية ووفقاً للقوانين المحلية.
+**Note**: This system is designed for educational and research purposes. Please use it responsibly and in accordance with local laws.

@@ -1,175 +1,175 @@
 # Slipstream Firewall Bypass & Proxy Support
 
-## نظرة عامة
+## Overview
 
-تم تطوير نظام متقدم لتجاوز الجدران النارية ودعم البروكسي في slipstream. هذا النظام يوفر تقنيات متعددة لتجاوز القيود الشبكية والوصول إلى الخدمات المحظورة.
+An advanced system has been developed for firewall bypass and proxy support in slipstream. This system provides multiple techniques to circumvent network restrictions and access blocked services.
 
-## تقنيات تجاوز الجدران النارية
+## Firewall Bypass Techniques
 
 ### 1. DNS Tunnel Bypass
-- **الوصف**: استخدام DNS queries/responses لنقل البيانات
-- **المميزات**: 
-  - تجاوز معظم الجدران النارية
-  - استخدام البنية التحتية الموجودة
-  - صعبة الكشف
-- **الاستخدام**: `slipstream_bypass_dns_tunnel()`
+- **Description**: Use DNS queries/responses to transmit data
+- **Features**: 
+  - Bypasses most firewalls
+  - Leverages existing infrastructure
+  - Hard to detect
+- **Usage**: `slipstream_bypass_dns_tunnel()`
 
 ### 2. HTTP Tunnel Bypass
-- **الوصف**: تمويه البيانات كـ HTTP requests
-- **المميزات**:
-  - تجاوز جدران نارية HTTP
-  - دعم HTTP headers
-  - سهولة التطبيق
-- **الاستخدام**: `slipstream_bypass_http_tunnel()`
+- **Description**: Camouflage data as HTTP requests
+- **Features**:
+  - Bypasses HTTP firewalls
+  - HTTP headers support
+  - Easy to deploy
+- **Usage**: `slipstream_bypass_http_tunnel()`
 
 ### 3. HTTPS Tunnel Bypass
-- **الوصف**: تمويه البيانات كـ HTTPS traffic
-- **المميزات**:
-  - تشفير البيانات
-  - تجاوز جدران نارية HTTPS
-  - حماية من DPI
-- **الاستخدام**: `slipstream_bypass_https_tunnel()`
+- **Description**: Camouflage data as HTTPS traffic
+- **Features**:
+  - Data encryption
+  - Bypasses HTTPS firewalls
+  - Protection against DPI
+- **Usage**: `slipstream_bypass_https_tunnel()`
 
 ### 4. ICMP Tunnel Bypass
-- **الوصف**: استخدام ICMP packets لنقل البيانات
-- **المميزات**:
-  - تجاوز جدران نارية متقدمة
-  - صعبة الكشف
-  - تتطلب صلاحيات root
-- **الاستخدام**: `slipstream_bypass_icmp_tunnel()`
+- **Description**: Use ICMP packets to transmit data
+- **Features**:
+  - Bypasses advanced firewalls
+  - Hard to detect
+  - Requires root privileges
+- **Usage**: `slipstream_bypass_icmp_tunnel()`
 
 ### 5. Fragmentation Bypass
-- **الوصف**: تقسيم البيانات إلى أجزاء صغيرة
-- **المميزات**:
-  - تجاوز فحص الحزم الكبيرة
-  - تقليل احتمالية الكشف
-  - دعم DNS packet limits
-- **الاستخدام**: `slipstream_bypass_fragmentation()`
+- **Description**: Split data into small fragments
+- **Features**:
+  - Bypasses inspection of large packets
+  - Reduces detection probability
+  - Supports DNS packet size limits
+- **Usage**: `slipstream_bypass_fragmentation()`
 
 ### 6. Steganography Bypass
-- **الوصف**: إخفاء البيانات في DNS queries
-- **المميزات**:
-  - إخفاء كامل للبيانات
-  - صعبة الكشف
-  - دعم base32 encoding
-- **الاستخدام**: `slipstream_bypass_steganography()`
+- **Description**: Hide data within DNS queries
+- **Features**:
+  - Complete data concealment
+  - Hard to detect
+  - Base32 encoding support
+- **Usage**: `slipstream_bypass_steganography()`
 
 ### 7. Protocol Mimicry Bypass
-- **الوصف**: محاكاة بروتوكولات أخرى
-- **المميزات**:
-  - دعم HTTP, DNS mimicry
-  - تجاوز DPI
-  - مرونة عالية
-- **الاستخدام**: `slipstream_bypass_protocol_mimicry()`
+- **Description**: Emulate other protocols
+- **Features**:
+  - HTTP and DNS mimicry support
+  - Bypasses DPI
+  - High flexibility
+- **Usage**: `slipstream_bypass_protocol_mimicry()`
 
 ### 8. Port Hopping Bypass
-- **الوصف**: تغيير المنافذ بشكل عشوائي
-- **المميزات**:
-  - تجاوز port blocking
-  - صعبة التتبع
-  - دعم نطاقات منافذ
-- **الاستخدام**: `slipstream_bypass_port_hopping()`
+- **Description**: Randomly change ports
+- **Features**:
+  - Bypasses port blocking
+  - Hard to track
+  - Supports port ranges
+- **Usage**: `slipstream_bypass_port_hopping()`
 
 ### 9. Domain Fronting Bypass
-- **الوصف**: استخدام CDN domains للوصول
-- **المميزات**:
-  - تجاوز domain blocking
-  - استخدام CDN infrastructure
-  - صعبة الكشف
-- **الاستخدام**: `slipstream_bypass_domain_fronting()`
+- **Description**: Use CDN domains for access
+- **Features**:
+  - Bypasses domain blocking
+  - Leverages CDN infrastructure
+  - Hard to detect
+- **Usage**: `slipstream_bypass_domain_fronting()`
 
 ### 10. CDN Bypass
-- **الوصف**: استخدام CDN providers للوصول
-- **المميزات**:
-  - تجاوز geographic restrictions
-  - دعم Cloudflare, AWS CloudFront
-  - أداء عالي
-- **الاستخدام**: `slipstream_bypass_cdn_bypass()`
+- **Description**: Use CDN providers for access
+- **Features**:
+  - Bypasses geographic restrictions
+  - Supports Cloudflare, AWS CloudFront
+  - High performance
+- **Usage**: `slipstream_bypass_cdn_bypass()`
 
-## تقنيات متقدمة
+## Advanced Techniques
 
 ### 1. DPI Evasion
-- **الوصف**: تجاوز Deep Packet Inspection
-- **التقنيات**:
+- **Description**: Evade Deep Packet Inspection
+- **Techniques**:
   - XOR obfuscation
   - Data scrambling
   - Header manipulation
-- **الاستخدام**: `slipstream_bypass_dpi_evasion()`
+- **Usage**: `slipstream_bypass_dpi_evasion()`
 
 ### 2. Traffic Obfuscation
-- **الوصف**: إخفاء أنماط المرور
-- **التقنيات**:
+- **Description**: Conceal traffic patterns
+- **Techniques**:
   - Random padding
   - Traffic shaping
   - Pattern breaking
-- **الاستخدام**: `slipstream_bypass_traffic_obfuscation()`
+- **Usage**: `slipstream_bypass_traffic_obfuscation()`
 
 ### 3. Timing Attack Evasion
-- **الوصف**: تجاوز تحليل التوقيت
-- **التقنيات**:
+- **Description**: Evade timing-based analysis
+- **Techniques**:
   - Random delays
   - Chunked transmission
   - Timing randomization
-- **الاستخدام**: `slipstream_bypass_timing_attack()`
+- **Usage**: `slipstream_bypass_timing_attack()`
 
 ### 4. Flow Watermarking
-- **الوصف**: إضافة watermarks للتدفق
-- **التقنيات**:
+- **Description**: Embed watermarks into traffic flows
+- **Techniques**:
   - Unique identifiers
   - Flow tracking
   - Session management
-- **الاستخدام**: `slipstream_bypass_flow_watermarking()`
+- **Usage**: `slipstream_bypass_flow_watermarking()`
 
-## دعم البروكسي
+## Proxy Support
 
 ### 1. HTTP Proxy
-- **الوصف**: دعم HTTP CONNECT method
-- **المميزات**:
-  - دعم authentication
+- **Description**: Support for HTTP CONNECT method
+- **Features**:
+  - Authentication support
   - SSL/TLS support
   - Keep-alive connections
-- **الاستخدام**: `slipstream_http_proxy_connect()`
+- **Usage**: `slipstream_http_proxy_connect()`
 
 ### 2. SOCKS4 Proxy
-- **الوصف**: دعم SOCKS4 protocol
-- **المميزات**:
+- **Description**: Support for SOCKS4 protocol
+- **Features**:
   - Simple protocol
   - IPv4 support
   - No authentication
-- **الاستخدام**: `slipstream_socks_proxy_connect()`
+- **Usage**: `slipstream_socks_proxy_connect()`
 
 ### 3. SOCKS5 Proxy
-- **الوصف**: دعم SOCKS5 protocol
-- **المميزات**:
+- **Description**: Support for SOCKS5 protocol
+- **Features**:
   - IPv4/IPv6 support
   - Authentication support
   - UDP support
-- **الاستخدام**: `slipstream_socks_proxy_connect()`
+- **Usage**: `slipstream_socks_proxy_connect()`
 
 ### 4. SSH Proxy
-- **الوصف**: دعم SSH tunneling
-- **المميزات**:
+- **Description**: Support for SSH tunneling
+- **Features**:
   - Encrypted connections
   - Port forwarding
   - Authentication support
-- **الاستخدام**: `slipstream_ssh_proxy_connect()`
+- **Usage**: `slipstream_ssh_proxy_connect()`
 
 ### 5. Tor Proxy
-- **الوصف**: دعم Tor network
-- **المميزات**:
+- **Description**: Support for Tor network
+- **Features**:
   - Anonymous routing
   - Onion routing
   - High anonymity
-- **الاستخدام**: `slipstream_tor_proxy_connect()`
+- **Usage**: `slipstream_tor_proxy_connect()`
 
-## كيفية الاستخدام
+## Usage
 
-### 1. استخدام أساسي
+### 1. Basic Usage
 
 ```c
 #include "slipstream_bypass.h"
 
-// تهيئة bypass manager
+// Initialize bypass manager
 slipstream_bypass_manager_t manager;
 slipstream_bypass_config_t bypass_config = {
     .technique = SLIPSTREAM_BYPASS_DNS_TUNNEL,
@@ -184,28 +184,28 @@ slipstream_proxy_config_t proxy_config = {
 
 slipstream_bypass_manager_init(&manager, &bypass_config, &proxy_config);
 
-// استخدام DNS tunnel bypass
+// Use DNS tunnel bypass
 slipstream_bypass_dns_tunnel(&manager, "example.com", 53);
 
-// استخدام proxy
+// Use proxy
 slipstream_proxy_connect(&manager, "target.com", 80);
 
-// تنظيف
+// Cleanup
 slipstream_bypass_manager_cleanup(&manager);
 ```
 
-### 2. استخدام متقدم
+### 2. Advanced Usage
 
 ```c
-// DNS tunnel مع fragmentation
+// DNS tunnel with fragmentation
 slipstream_bypass_dns_tunnel(&manager, "example.com", 53);
 slipstream_bypass_fragmentation(&manager, data, data_len);
 
-// HTTP tunnel مع domain fronting
+// HTTP tunnel with domain fronting
 slipstream_bypass_http_tunnel(&manager, "example.com", 80);
 slipstream_bypass_domain_fronting(&manager, "cdn.example.com", "real.example.com");
 
-// SOCKS5 proxy مع authentication
+// SOCKS5 proxy with authentication
 slipstream_proxy_config_t proxy_config = {
     .type = SLIPSTREAM_PROXY_SOCKS5_AUTH,
     .hostname = "proxy.example.com",
@@ -216,7 +216,7 @@ slipstream_proxy_config_t proxy_config = {
 };
 ```
 
-### 3. استخدام تقنيات متقدمة
+### 3. Advanced Techniques Usage
 
 ```c
 // DPI evasion
@@ -232,38 +232,38 @@ slipstream_bypass_timing_attack(&manager, data, data_len);
 slipstream_bypass_flow_watermarking(&manager, data, data_len);
 ```
 
-## أمثلة عملية
+## Practical Examples
 
-### 1. تجاوز جدار ناري بسيط
+### 1. Simple Firewall Bypass
 
 ```bash
-# استخدام DNS tunnel
+# Use DNS tunnel
 ./examples/bypass_example dns example.com 53
 
-# استخدام HTTP tunnel
+# Use HTTP tunnel
 ./examples/bypass_example http example.com 80
 ```
 
-### 2. تجاوز جدار ناري متقدم
+### 2. Advanced Firewall Bypass
 
 ```bash
-# استخدام HTTPS tunnel مع SOCKS5 proxy
+# Use HTTPS tunnel with SOCKS5 proxy
 ./examples/bypass_example https example.com 443 socks5 proxy.example.com 1080
 
-# استخدام domain fronting
+# Use domain fronting
 ./examples/bypass_example domain_fronting example.com 80
 ```
 
-### 3. استخدام Tor
+### 3. Using Tor
 
 ```bash
-# استخدام Tor proxy
+# Use Tor proxy
 ./examples/bypass_example http example.com 80 tor tor-proxy.example.com 9050
 ```
 
-## التجميع والاختبار
+## Building and Testing
 
-### 1. تجميع المشروع
+### 1. Build Project
 
 ```bash
 mkdir build
@@ -272,76 +272,76 @@ cmake ..
 make
 ```
 
-### 2. تشغيل الأمثلة
+### 2. Run Examples
 
 ```bash
-# اختبار DNS tunnel
+# Test DNS tunnel
 ./examples/bypass_example dns 8.8.8.8 53
 
-# اختبار HTTP tunnel
+# Test HTTP tunnel
 ./examples/bypass_example http httpbin.org 80
 
-# اختبار SOCKS5 proxy
+# Test SOCKS5 proxy
 ./examples/bypass_example http example.com 80 socks5 proxy.example.com 1080
 ```
 
-## المتطلبات
+## Requirements
 
-- **OpenSSL**: مطلوب للـ HTTPS و SSH
-- **pthread**: مطلوب للـ threading
-- **Root privileges**: مطلوب لـ ICMP tunnel
-- **Network access**: مطلوب للاتصال بالبروكسي
+- **OpenSSL**: Required for HTTPS and SSH
+- **pthread**: Required for threading
+- **Root privileges**: Required for ICMP tunnel
+- **Network access**: Required to connect to proxy
 
-## الأمان والخصوصية
+## Security and Privacy
 
-### 1. تشفير البيانات
-- دعم SSL/TLS للاتصالات
-- تشفير البيانات قبل النقل
-- حماية من man-in-the-middle attacks
+### 1. Data Encryption
+- SSL/TLS support for connections
+- Data encryption before transmission
+- Protection against man-in-the-middle attacks
 
-### 2. إخفاء الهوية
-- دعم Tor network
+### 2. Anonymity
+- Tor network support
 - Anonymous routing
 - IP address masking
 
-### 3. حماية من الكشف
+### 3. Anti-Detection
 - DPI evasion techniques
 - Traffic obfuscation
 - Protocol mimicry
 
-## التطويرات المستقبلية
+## Future Developments
 
-1. **دعم IPv6**: دعم كامل لـ IPv6
-2. **دعم QUIC**: دعم QUIC protocol
-3. **دعم WebRTC**: دعم WebRTC tunneling
-4. **دعم Blockchain**: دعم blockchain-based routing
-5. **دعم AI**: استخدام AI لتجنب الكشف
+1. **IPv6 Support**: Full IPv6 compatibility
+2. **QUIC Support**: QUIC protocol integration
+3. **WebRTC Support**: WebRTC tunneling support
+4. **Blockchain Support**: Blockchain-based routing
+5. **AI Support**: AI-driven detection avoidance
 
-## المساهمة
+## Contributing
 
-للمساهمة في تطوير النظام:
+To contribute to system development:
 
-1. Fork المشروع
-2. إنشاء branch جديد
-3. إضافة تقنية جديدة
-4. كتابة الاختبارات
-5. إرسال Pull Request
+1. Fork the project
+2. Create a new branch
+3. Add a new technique
+4. Write tests
+5. Submit a Pull Request
 
-## الترخيص
+## License
 
-هذا المشروع مرخص تحت نفس ترخيص slipstream الأصلي.
+This project is licensed under the same license as the original slipstream.
 
-## تحذيرات قانونية
+## Legal Warnings
 
-⚠️ **تحذير**: استخدام تقنيات تجاوز الجدران النارية قد يكون غير قانوني في بعض البلدان. يرجى التأكد من الامتثال للقوانين المحلية قبل الاستخدام.
+⚠️ **Warning**: Using firewall bypass techniques may be used only for legal purposes in some countries. Please ensure compliance with local laws before use.
 
-## الدعم
+## Support
 
-للحصول على الدعم:
-- إنشاء issue في GitHub
-- مراجعة الوثائق
-- المشاركة في المناقشات
+For support:
+- Create a GitHub issue
+- Review documentation
+- Join discussions
 
 ---
 
-**ملاحظة**: هذا النظام مصمم للأغراض التعليمية والبحثية. يرجى استخدامه بمسؤولية ووفقاً للقوانين المحلية.
+**Note**: This system is designed for educational and research purposes. Please use it responsibly and in accordance with local laws.
