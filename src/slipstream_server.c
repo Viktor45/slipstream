@@ -207,7 +207,7 @@ typedef struct st_slipstream_server_ctx_t {
 } slipstream_server_ctx_t;
 
 slipstream_server_stream_ctx_t* slipstream_server_create_stream_ctx(slipstream_server_ctx_t* server_ctx,
-                                                                    uint64_t stream_id) {
+                                                                     uint64_t stream_id) {
     slipstream_server_stream_ctx_t* stream_ctx = malloc(sizeof(slipstream_server_stream_ctx_t));
 
     if (stream_ctx == NULL) {
@@ -257,7 +257,21 @@ static void slipstream_server_free_stream_context(slipstream_server_ctx_t* serve
         server_ctx->first_stream = stream_ctx->next_stream;
     }
 
-    stream_ctx->fd = close(stream_ctx->fd);
+    /* FIX: Ensure both pipe file descriptors are closed to unblock and terminate the slipstream_io_copy thread. */
+    if (stream_ctx->pipefd[0] >= 0) {
+        close(stream_ctx->pipefd[0]);
+        stream_ctx->pipefd[0] = -1;
+    }
+    if (stream_ctx->pipefd[1] >= 0) {
+        close(stream_ctx->pipefd[1]);
+        stream_ctx->pipefd[1] = -1;
+    }
+
+    /* FIX: Corrected the usage of close() on the socket FD. */
+    if (stream_ctx->fd >= 0) {
+        close(stream_ctx->fd);
+        stream_ctx->fd = -1;
+    }
 
     free(stream_ctx);
 }
@@ -296,7 +310,7 @@ void slipstream_server_mark_active_pass(slipstream_server_ctx_t* server_ctx) {
 }
 
 int slipstream_server_sockloop_callback(picoquic_quic_t* quic, picoquic_packet_loop_cb_enum cb_mode,
-                                   void* callback_ctx, void* callback_arg) {
+                                     void* callback_ctx, void* callback_arg) {
     slipstream_server_ctx_t* default_ctx = callback_ctx;
 
     switch (cb_mode) {
@@ -404,7 +418,13 @@ void* slipstream_io_copy(void* arg) {
 
     if (connect(socket, (struct sockaddr*)&server_ctx->upstream_addr, sizeof(server_ctx->upstream_addr)) < 0) {
         perror("connect() failed");
-        return NULL;
+        /* The stream thread is exiting before it has completed any work. It must be cleaned up from the QUIC context. */
+        /* To unblock the QUIC thread, mark stream as active and reset it. */
+        stream_ctx->set_active = 1;
+        picoquic_wake_up_network_thread(server_ctx->thread_ctx);
+        
+        /* The thread returns, but the stream context remains. It will be cleaned up by a later call, e.g., on connection close. */
+        return NULL; 
     }
 
     DBG_PRINTF("[%lu:%d] setup pipe done", stream_ctx->stream_id, stream_ctx->fd);
@@ -425,9 +445,9 @@ void* slipstream_io_copy(void* arg) {
         DBG_PRINTF("[%lu:%d] read %d bytes", stream_ctx->stream_id, stream_ctx->fd, bytes_read);
         if (bytes_read < 0) {
             perror("recv failed");
-            return NULL;
+            break; // Exit loop on read error
         } else if (bytes_read == 0) {
-            // End of stream - source socket closed connection
+            // End of stream - pipe write end (pipefd[1]) was closed by the main thread
             break;
         }
 
@@ -438,13 +458,24 @@ void* slipstream_io_copy(void* arg) {
             ssize_t bytes_written = send(socket, p, remaining, 0);
             if (bytes_written < 0) {
                 perror("send failed");
-                return NULL;
+                break; // Exit inner loop on send error
             }
             remaining -= bytes_written;
             p += bytes_written;
         }
+        if (remaining > 0) {
+            break; // Exit outer loop if inner loop failed (send error)
+        }
     }
 
+    /* FIX: When the io_copy thread exits, it must signal that the upstream socket is done. 
+     * The `slipstream_server_poller` will eventually see EOF on the socket and trigger stream reset/close.
+     * The socket is managed by the stream context, which will be freed later. 
+     * Closing the socket is handled in the main thread (picoquic_callback_stream_fin/reset/close). 
+     * Since this thread's purpose is copying, it will exit, and cleanup is handled by the main QUIC loop.
+     */
+
+    free(args); /* Free the args allocated in slipstream_server_callback */
     return NULL;
 }
 
@@ -548,11 +579,26 @@ int slipstream_server_callback(picoquic_cnx_t* cnx,
             }
         }
         if (fin_or_event == picoquic_callback_stream_fin) {
-            DBG_PRINTF("[stream_id=%d] fin", stream_ctx->stream_id);
-            /* Close the local_sock fd */
-            close(stream_ctx->fd);
-            stream_ctx->fd = -1;
-            picoquic_unlink_app_stream_ctx(cnx, stream_id);
+            DBG_PRINTF("[stream_id=%d] fin (client done sending)", stream_ctx->stream_id);
+            
+            /* FIX: When client finishes sending (FIN), close the pipe's write end (pipefd[1]). 
+             * This signals EOF to the slipstream_io_copy thread, allowing it to exit gracefully.
+             * We also remove the premature unlinking of the context. 
+             */
+            if (stream_ctx->pipefd[1] >= 0) {
+                close(stream_ctx->pipefd[1]);
+                stream_ctx->pipefd[1] = -1;
+            }
+
+            /* The original code closed the socket here, we preserve the intent, but the main goal 
+             * is to terminate the thread, which closing pipefd[1] achieves. */
+            if (stream_ctx->fd >= 0) {
+                close(stream_ctx->fd);
+                stream_ctx->fd = -1;
+            }
+
+            /* Removed: picoquic_unlink_app_stream_ctx(cnx, stream_id) to ensure stream_ctx is available 
+             * for freeing in reset/close callbacks. */
         }
         break;
     case picoquic_callback_stop_sending: /* Should not happen, treated as reset */
@@ -567,6 +613,7 @@ int slipstream_server_callback(picoquic_cnx_t* cnx,
         else {
             DBG_PRINTF("[stream_id=%d] stream reset", stream_ctx->stream_id);
 
+            /* The free function now closes both pipe ends, unblocking the worker thread. */
             slipstream_server_free_stream_context(server_ctx, stream_ctx);
             picoquic_reset_stream(cnx, stream_id, SLIPSTREAM_FILE_CANCEL_ERROR);
         }
@@ -576,6 +623,8 @@ int slipstream_server_callback(picoquic_cnx_t* cnx,
     case picoquic_callback_application_close: /* Received application close */
         DBG_PRINTF("Connection closed.", NULL);
         if (server_ctx != NULL) {
+            /* This calls slipstream_server_free_stream_context for all streams, which now
+             * correctly closes the pipe FDs to unblock all worker threads. */
             slipstream_server_free_context(server_ctx);
         }
         /* Remove the application callback */
@@ -678,7 +727,7 @@ int slipstream_server_callback(picoquic_cnx_t* cnx,
 }
 
 int picoquic_slipstream_server(int server_port, const char* server_cert, const char* server_key,
-                               struct sockaddr_storage* target_address, const char* domain_name) {
+                                 struct sockaddr_storage* target_address, const char* domain_name) {
     /* Start: start the QUIC process with cert and key files */
     int ret = 0;
     uint64_t current_time = 0;
@@ -768,4 +817,3 @@ int picoquic_slipstream_server(int server_port, const char* server_cert, const c
 
     return ret;
 }
-
